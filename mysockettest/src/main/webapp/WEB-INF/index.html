@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Angular App</title>
+</head>
+<script src="js/angular-1.8.0/angular.min.js"></script>
+<script src="https://cdn.staticfile.org/echarts/5.4.0/echarts.min.js"></script>
+<link rel="stylesheet"
+	href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css">
+<style type="text/css">
+* {
+	padding: 0px;
+	margin: 0px;
+}
+
+h4 {
+	font-weight: normal;
+	font-size: 16px;
+}
+
+h5 {
+	font-weight: normal;
+	font-size: 12px;
+}
+
+botton {
+	font-size: 12px;
+}
+</style>
+<body ng-app="myApp" style="background-color: aliceblue">
+	<script type="text/javascript">
+		var app = angular.module('myApp', []);
+		var saveMovieId = '';
+		var saveCinemaId = '';
+		var saveSchedulId = '';
+		// 请求头
+		app.run(function($http) {
+			$http.defaults.headers.post = {
+				'Content-Type' : 'application/json'
+			}
+		});
+	</script>
+	<div id="graph" style="width: 800px; height: 240px"></div>
+	<div style="background-color: antiquewhite;">
+		<h3>选电影&nbsp;&nbsp;
+			<button id="pushStart">开始</button>
+		</h3>
+		<div id="listMoive" style="display: flex; padding: 10px;"
+			ng-controller="movieCtrl">
+			<div ng-repeat="x in movies" style="width: 180px; height: 330px;">
+				<img alt="海报" width="150px" height="200px"
+					src="img/{{ x.content.placard }}" /> <br>
+				<h4>
+					<input type="radio" name="movieSel"
+						ng-click="pushMovie( x.content.id )">《{{ x.content.name }}》
+				</h4>
+				<h5>主演：{{ x.content.actor }}</h5>
+				<h5>导演：{{ x.content.director }}</h5>
+				<h5>上映：{{ x.content.year }} 年</h5>
+				<h5>片长：{{ x.content.mins }} 分钟</h5>
+			</div>
+			<div ng-if="isError">没有获取电影数据！</div>
+		</div>
+	</div>
+	<script>
+		app.controller('movieCtrl', function($scope, $http) {
+			$scope.pushMovie = function(id) {
+				saveMovieId = id;
+				if (saveCinemaId == '') {
+					// 影院不需要重新刷，初期化
+					getCinemaData();
+				} else {
+					// 影院已选，初期化场次
+					getSchedulData();
+				}
+			}
+			$scope.getData = function() {
+				$http.get("http://localhost:8086/rest/movies").then(
+						function(result) {
+							$scope.movies = result.data;
+						},
+						function(data, status, headers, config) {
+							$scope.isError = true;
+							console.log("Error------" + JSON.stringify(data)
+									+ " " + status)
+						});
+			}
+		});
+	</script>
+	<div style="background-color: azure;">
+		<h3>选影院</h3>
+		<div id="listCinema" style="display: flex; padding: 10px;"
+			ng-controller="cinemaCtrl">
+			<div ng-repeat="x in cinemas" style="width: 250px; height: 130px;">
+				<h4>
+					<input type="radio" name="cinemaSel"
+						ng-click="pushCinema( x.content.id )" />{{ x.content.name }}
+				</h4>
+				<h5>城市：{{ x.content.city }}</h5>
+				<h5
+					style="width: 240px; word-wrap: break-word; word-break: break-all; overflow: hidden;">地址：{{
+					x.content.address }}</h5>
+			</div>
+			<div ng-if="isError">没有获取电影院数据！</div>
+		</div>
+	</div>
+	<script>
+		app.controller('cinemaCtrl', function($scope, $http) {
+			$scope.pushCinema = function(id) {
+				saveCinemaId = id;
+				getSchedulData();
+			}
+			$scope.getData = function() {
+				$http.get("http://localhost:8086/rest/cinemas").then(
+						function(result) {
+							console.log("cinemas" + result);
+							$scope.cinemas = result.data;
+						},
+						function(data, status, headers, config) {
+							$scope.isError = true;
+							//前回结果清除
+							$scope.cinemas = {};
+							console.log("Error------" + JSON.stringify(data)
+									+ " " + status)
+						});
+			}
+		});
+	</script>
+	<div style="background-color: beige">
+		<h3>选场次</h3>
+		<div id="listSchedul" style="display: flex; padding: 10px;"
+			ng-controller="schedulCtrl">
+			<div ng-repeat="x in scheduls" style="width: 200px; height: 130px;">
+				<h4>
+					<input type="radio" name="schedulSel"
+						ng-click="pushSchedul(  x.content.id )" />¥ {{ x.content.price }}
+				</h4>
+				<h5>{{ x.content.hall }}号放映厅</h5>
+				<h5 style="width: 180px;">开映时间：{{ x.content.showtime | date :
+					'yyyy-MM-dd HH:mm' : timezone }}</h5>
+			</div>
+			<div ng-if="isError">没有获取电影场次数据！</div>
+		</div>
+	</div>
+	<script>
+		app.controller('schedulCtrl', function($scope, $http) {
+			$scope.pushSchedul = function(id) {
+				saveSchedulId = id;
+				showBookingTicketData();
+			}
+			$scope.getData = function() {
+				$http.get(
+						"http://localhost:8086/rest/scheduls/movie/" + saveMovieId
+								+ "/cinema/" + saveCinemaId).then(
+						function(result) {
+							$scope.scheduls = result.data;
+							$scope.isError = false;
+						},
+						function(data, status, headers, config) {
+							$scope.isError = true;
+							console.log("Error------" + JSON.stringify(data)
+									+ " " + status);
+							saveSchedulId = '';
+							$scope.scheduls = {};
+							hideBookingTicketData();
+						});
+			}
+		});
+	</script>
+	<div id="commitTicket" style="background-color: cornsilk">
+		<h3>去订票</h3>
+		<div id="bookeTicket" style="display: flex; padding: 10px;" ng-show="bookshow" ng-controller="ticketCtrl">
+			<form novalidate>
+				联系电话:<br> <input type="text" ng-model="ticket.phone"> <br>
+				<br>
+				<button ng-click="postData()">订票</button>
+				<br>
+				{{ msg }}
+			</form>
+		</div>
+	</div>
+	<script>
+		app.controller('ticketCtrl', function($scope, $http,
+				$httpParamSerializerJQLike) {
+			$scope.postData = function() {
+				$http({
+					url : 'http://localhost:8086/rest/tickets',
+					method : 'POST',
+					data : {
+						'schedulId' : $scope.schedulId,
+						'phone' : ($scope.ticket)? $scope.ticket.phone: ''
+					}
+				}).then(
+				function(result) {
+					console.log("success" + result);
+					$scope.msg = '订票成功';
+				},
+				function(data, status, headers, config) {
+					$scope.msg = '订票失败';
+					console.log("Error------" + JSON.stringify(data)
+							+ " " + status)
+				});
+			}
+		});
+
+		onload = function() {
+			//开始的操作
+			document.getElementById('pushStart').onclick = function() {
+				//通过controller来获取Angular应用
+				var appElement = document
+						.querySelector('[ng-controller=movieCtrl]');
+				//获取$scope变量
+				var $scope = angular.element(appElement).scope();
+				//启动http调用
+				$scope.getData();
+				//上一行改变了result的值，如果想同步到Angular控制器中，则需要调用$apply()方法即可
+				$scope.$apply();
+			}
+		}
+		
+		function getCinemaData() {
+			//通过controller来获取Angular应用
+			var appElement = document.querySelector('[ng-controller=cinemaCtrl]');
+			//获取$scope变量
+			var $scope = angular.element(appElement).scope();
+			//启动http调用
+			$scope.getData();
+			//上一行改变了result的值，如果想同步到Angular控制器中，则需要调用$apply()方法即可
+			$scope.$apply();
+		}
+		
+		function getSchedulData() {
+			//通过controller来获取Angular应用
+			var appElement = document.querySelector('[ng-controller=schedulCtrl]');
+			//获取$scope变量
+			var $scope = angular.element(appElement).scope();
+			//启动http调用
+			$scope.getData();
+			//上一行改变了result的值，如果想同步到Angular控制器中，则需要调用$apply()方法即可
+			$scope.$apply();
+			saveSchedulId = '';
+		}
+		
+		function showBookingTicketData() {
+			//通过controller来获取Angular应用
+			var appElement = document.querySelector('[ng-controller=ticketCtrl]');
+			//获取$scope变量
+			var $scope = angular.element(appElement).scope();
+			//显示订票页面
+			$scope.bookshow = true;
+			$scope.schedulId = saveSchedulId;
+			//上一行改变了show的值，如果想同步到Angular控制器中，则需要调用$apply()方法即可
+			$scope.$apply();
+		}
+		
+		function hideBookingTicketData() {
+			//通过controller来获取Angular应用
+			var appElement = document
+					.querySelector('[ng-controller=ticketCtrl]');
+			//获取$scope变量
+			var $scope = angular.element(appElement).scope();
+			//显示订票页面
+			$scope.bookshow = false;
+			$scope.$apply();
+		}
+	</script>
+	<script type="text/javascript" src="js/graph.js"></script>
+</body>
+</html>
