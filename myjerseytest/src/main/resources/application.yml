@@ -1,0 +1,29 @@
+server:
+    port: 8086
+##    servlet:
+##        context-path: /rest
+    tomcat:
+        additional-tld-skip-patterns: asm.jar,class-model.jar,hk2-runlevel.jar,hk2-utils.jar,jakarta.annotation-api.jar,jakarta.inject.jar,hk2-api.jar,hk2-core.jar,hk2-locator.jar,javassist.jar
+
+spring: 
+    jersey: 
+        application-path: /rest
+    resources:
+        static-locations: classpath:static/
+    main:
+        banner-mode: "off"     
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: "jdbc:mysql://localhost:3306/mymovie?characterEncoding=UTF-8&serverTimezone=GMT%2B8"
+        username: root
+        password: 
+    jpa:
+        generate-ddl: false
+        show-sql: true
+        hibernate: 
+            dialect: org.hibernate.dialect.MySQLDialect
+            ddl-auto: validate
+logging: 
+    level: 
+        org: 
+            springframework: ERROR
