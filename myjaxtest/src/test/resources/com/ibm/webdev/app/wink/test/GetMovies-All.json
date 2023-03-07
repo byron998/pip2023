@@ -1,0 +1,50 @@
+[
+    {
+        "content": {
+    		"actor": "吴京",
+            "director": "郭帆",
+            "id": "1",
+            "mins": 173,
+            "name": "流浪地球 2",
+            "placard": "https://img1.doubanio.com/view/photo/m/public/p2885955777.webp",
+            "year": 2023
+        },
+        "link": "http://localhost:8080/myjaxtest/rest/movies/1"
+    },
+    {
+        "content": {
+            "actor": "易烊千玺",
+            "director": "张艺谋",
+            "id": "2",
+            "mins": 159,
+            "name": "满江红",
+            "placard": "https://img1.doubanio.com/view/photo/m/public/p2886465677.webp",
+            "year": 2023
+        },
+        "link": "http://localhost:8080/myjaxtest/rest/movies/2"
+    },
+    {
+        "content": {
+            "actor": "吴京",
+            "director": "郭帆",
+            "id": "3",
+            "mins": 125,
+            "name": "流浪地球",
+            "placard": "https://img2.doubanio.com/view/photo/m/public/p2545472803.webp",
+            "year": 2019
+        },
+        "link": "http://localhost:8080/myjaxtest/rest/movies/3"
+    },
+    {
+        "content": {
+            "actor": "梁朝伟",
+            "director": "程耳",
+            "id": "4",
+            "mins": 128,
+            "name": "无名",
+            "placard": "https://img1.doubanio.com/view/photo/m/public/p2886187418.webp",
+            "year": 2023
+        },
+        "link": "http://localhost:8080/myjaxtest/rest/movies/4"
+    }
+]

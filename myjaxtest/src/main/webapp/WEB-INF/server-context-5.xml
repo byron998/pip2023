@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+	<!-- Resources -->
+	<bean id="resource.HelloWorld" class="com.ibm.webdev.app.wink.resource.HelloWorld" />
+	<bean id="resource.MovieResource" class="com.ibm.webdev.app.wink.resource.MovieResource" />
+	<bean id="resource.CinemaResource" class="com.ibm.webdev.app.wink.resource.CinemaResource" />
+	<bean id="resource.SchedulResource" class="com.ibm.webdev.app.wink.resource.SchedulResource" />
+	<bean id="resource.TicketResource" class="com.ibm.webdev.app.wink.resource.TicketResource" />
+	
+	<!-- Validation Configuration -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+	    <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+	    <property name="validationMessageSource" ref="messageSource"/>
+	</bean>
+	<mvc:annotation-driven validator="validator"/>
+	
+	<!--校验错误信息配置文件-->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+	    <property name="basenames">
+	        <list>
+	            <value>WEB-INF/validation-messages.properties</value>
+	        </list>
+	    </property>
+	    <!--文件格式设置为“utf-8”-->
+	    <property name="fileEncodings" value="utf-8"/>
+	    <!--内容缓存时间设置为120s-->
+	    <property name="cacheSeconds" value="120"/>
+	</bean>
+
+
+	<bean class="org.apache.wink.spring.Registrar">
+		<property name="classes">
+			<set value-type="java.lang.Class">
+			</set>
+		</property>
+		<property name="instances">
+			<set>
+				<ref bean="resource.HelloWorld" />
+				<ref bean="resource.MovieResource" />
+				<ref bean="resource.CinemaResource" />
+				<ref bean="resource.SchedulResource" />
+				<ref bean="resource.TicketResource" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Custom proprties defintion -->
+
+	<!-- movies.customPropertiesFactory defines loaded of the custom properties file -->
+	<bean id="server.customPropertiesFactory"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>WEB-INF/server.properties
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- movies.placeholderConfigurer overrides the default winkPropertiesFactory placeholder
+	     that causes Wink to use movies.customPropertiesFactory instead of the default one -->
+	<bean id="helloworld.placeholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+		<property name="propertiesArray">
+			<list>
+				<props>
+					<prop key="winkPropertiesFactory">server.customPropertiesFactory
+					</prop>
+				</props>
+			</list>
+		</property>
+	</bean>
+	<bean id="movieresource.placeholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+		<property name="propertiesArray">
+			<list>
+				<props>
+					<prop key="winkPropertiesFactory">server.customPropertiesFactory
+					</prop>
+				</props>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cinemaresource.placeholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+		<property name="propertiesArray">
+			<list>
+				<props>
+					<prop key="winkPropertiesFactory">server.customPropertiesFactory
+					</prop>
+				</props>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="schedulresource.placeholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+		<property name="propertiesArray">
+			<list>
+				<props>
+					<prop key="winkPropertiesFactory">server.customPropertiesFactory
+					</prop>
+				</props>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="ticketresource.placeholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+		<property name="propertiesArray">
+			<list>
+				<props>
+					<prop key="winkPropertiesFactory">server.customPropertiesFactory
+					</prop>
+				</props>
+			</list>
+		</property>
+	</bean>
+	
+</beans>
